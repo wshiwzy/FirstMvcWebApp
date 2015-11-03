@@ -4,9 +4,6 @@ import java.io.Serializable;
 
 public class Employee implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private Long employeeId;
@@ -20,18 +17,6 @@ public class Employee implements Serializable {
 	private String address;
 
 	private String tel;
-
-	public Employee(){
-		
-	}
-	public Employee(String name, Integer age, Boolean isEnable, String address,
-			String tel) {
-		this.address = address;
-		this.name = name;
-		this.age = age;
-		this.enable = isEnable;
-		this.tel = tel;
-	}
 
 	public long getEmployeeId() {
 		return employeeId;

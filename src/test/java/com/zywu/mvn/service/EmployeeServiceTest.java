@@ -13,7 +13,7 @@ import com.zywu.mvn.dao.EmployeeDao;
 import com.zywu.mvn.pojo.Employee;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"file:/Users/john/Documents/code/FirstMvcWebApp/src/main/resources/config/FirstMvcWebApp-servlet.xml"})
+@ContextConfiguration(locations={"file:/Users/john/Documents/code/FirstMvcWebApp/src/main/resources/config/spring-mvc.xml"})
 public class EmployeeServiceTest extends AbstractJUnit4SpringContextTests {
 
 	@Autowired

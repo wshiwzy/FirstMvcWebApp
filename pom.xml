@@ -16,9 +16,28 @@
 		<mybatis.version>3.2.8</mybatis.version>
 		<mysql.version>5.1.34</mysql.version>
 		<mybatis-spring.version>1.2.2</mybatis-spring.version>
+		<jackjon.version>2.6.2</jackjon.version>
 	</properties>
 
 	<dependencies>
+		<!--json-->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackjon.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackjon.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackjon.version}</version>
+		</dependency>
+
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
