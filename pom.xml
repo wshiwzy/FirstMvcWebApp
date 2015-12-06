@@ -36,7 +36,11 @@
 			<artifactId>jackson-annotations</artifactId>
 			<version>${jackjon.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>${jackjon.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>

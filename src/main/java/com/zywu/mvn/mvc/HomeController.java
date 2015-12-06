@@ -82,6 +82,8 @@ public class HomeController {
 	@RequestMapping(value = "/getemps", method = RequestMethod.GET)
 	public @ResponseBody List<Employee> getemps() {
 
-		return employeeService.getAllEmployees();
+		List<Employee> employees = employeeService.getAllEmployees();
+		employees.stream().forEach(r->r.setName("你好"));
+		return employees;
 	}
 }

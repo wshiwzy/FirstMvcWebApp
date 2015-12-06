@@ -8,4 +8,4 @@ CREATE TABLE `employee` (
   `address` varchar(100) NOT NULL,
   `tel` varchar(20) NOT NULL,
   PRIMARY KEY (`employeeid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8

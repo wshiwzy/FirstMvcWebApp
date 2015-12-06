@@ -1,7 +1,9 @@
 package com.zywu.mvn.pojo;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
+@XmlRootElement
 public class Employee implements Serializable {
 
 	private static final long serialVersionUID = 1L;
