@@ -4,86 +4,152 @@ import com.zywu.mvn.pojo.Employee;
 import com.zywu.mvn.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 @Controller
 public class HomeController {
 
-	@Autowired
-	EmployeeService employeeService;
+    final static String FILEPATH = "/Users/john/Downloads/";
 
-	@RequestMapping("/emp/{id}")
-	public ModelAndView Index(@PathVariable String id) {
+    @Autowired
+    EmployeeService employeeService;
 
-		ModelAndView mav = new ModelAndView("detail");
+    @RequestMapping("/emp/{id}")
+    public ModelAndView Index(@PathVariable String id) {
 
-		Employee employee = employeeService
-				.findEmployeeById(Long.parseLong(id));
+        ModelAndView mav = new ModelAndView("detail");
 
-		mav.addObject("employeeName", employee.getName());
-		mav.addObject("age", employee.getAge());
-		mav.addObject("enable", employee.isEnable());
-		mav.addObject("address", employee.getAddress());
-		mav.addObject("tel", employee.getTel());
-		return mav;
+        Employee employee = employeeService
+                .findEmployeeById(Long.parseLong(id));
 
-	}
+        mav.addObject("employeeName", employee.getName());
+        mav.addObject("age", employee.getAge());
+        mav.addObject("enable", employee.isEnable());
+        mav.addObject("address", employee.getAddress());
+        mav.addObject("tel", employee.getTel());
+        return mav;
 
-	@RequestMapping(value = "/add", method = RequestMethod.POST)
-	public ModelAndView Add(HttpServletRequest request) {
+    }
 
-		ModelAndView mav = new ModelAndView();
-		try {
-			Employee employee = new Employee();
-			employee.setAddress(request.getParameter("address"));
-			employee.setAge(Integer.parseInt(request.getParameter("age")));
-			employee.setEnable("on".equals(request.getParameter("enable")));
-			employee.setName(request.getParameter("name"));
-			employee.setTel(request.getParameter("tel"));
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    public ModelAndView Add(HttpServletRequest request) {
 
-			Long empid = employeeService.addEmployee(employee);
-			mav.setViewName("redirect:/emp/" + empid.toString());
+        ModelAndView mav = new ModelAndView();
+        try {
+            Employee employee = new Employee();
+            employee.setAddress(request.getParameter("address"));
+            employee.setAge(Integer.parseInt(request.getParameter("age")));
+            employee.setEnable("on".equals(request.getParameter("enable")));
+            employee.setName(request.getParameter("name"));
+            employee.setTel(request.getParameter("tel"));
 
-		} catch (Exception e) {
-			mav.setViewName("redirect:/emps");
-		}
-		return mav;
-	}
+            Long empid = employeeService.addEmployee(employee);
+            mav.setViewName("redirect:/emp/" + empid.toString());
 
-	@RequestMapping(value = "/add", method = RequestMethod.GET)
-	public ModelAndView Add() {
+        } catch (Exception e) {
+            mav.setViewName("redirect:/emps");
+        }
+        return mav;
+    }
 
-		ModelAndView mav = new ModelAndView("add");
+    @RequestMapping(value = "/addfile", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> AddFile(HttpServletRequest request, @RequestParam("file") CommonsMultipartFile file) throws Exception {
+        Map<String, Object> map = new HashMap<String, Object>();
+        String savePath = request.getServletContext().getRealPath("/WEB-INF/upload/");
+        //得到上传文件的保存目录，将上传的文件存放于WEB-INF目录下，不允许外界直接访问，保证上传文件的安全
+        File fileDic = new File(savePath);
+        //判断上传文件的保存目录是否存在
+        if (!fileDic.exists() && !fileDic.isDirectory()) {
+            System.out.println(savePath + "目录不存在，需要创建");
+            //创建目录
+            fileDic.mkdir();
+        }
 
-		return mav;
-	}
+        if (!file.isEmpty()) {
+            String filename = file.getOriginalFilename();
+            File file1 = new File(savePath + filename);
+            //防止重名
+            while (file1.exists()) {
+                filename = file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf('.')) + (new Random().nextInt(100000) + 100000) + file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.'));
+                file1 = new File(savePath + filename);
+            }
+            //创建一个文件输出流
+            FileOutputStream out = new FileOutputStream(file1);
 
-	@RequestMapping("/emps")
-	public ModelAndView All() {
+            //获取item中的上传文件的输入流
+            InputStream in = file.getInputStream();
 
-		
-		ModelAndView mav = new ModelAndView("index");
+            //创建一个缓冲区
+            byte buffer[] = new byte[1024];
+            //判断输入流中的数据是否已经读完的标识
+            int len = 0;
+            //循环将输入流读入到缓冲区当中，(len=in.read(buffer))>0就表示in里面还有数据
+            while ((len = in.read(buffer)) > 0) {
+                //使用FileOutputStream输出流将缓冲区的数据写入到指定的目录(savePath + filename)当中
+                out.write(buffer, 0, len);
+            }
+            //关闭输入流
+            in.close();
+            //关闭输出流
+            out.close();
+            //删除临时文件
+            file.getFileItem().delete();
+            map.put("success", true);
+            map.put("imageUrl", savePath + filename);
 
-		List<Employee> employees = employeeService.getAllEmployees();
+        }
+        return map;
+    }
 
-		mav.addObject("employees", employees);
-		return mav;
+    @RequestMapping(value = "/addfile", method = RequestMethod.GET)
+    public ModelAndView Addfile() {
 
-	}
+        ModelAndView mav = new ModelAndView("fileupload");
+
+        return mav;
+    }
+
+    @RequestMapping(value = "/add", method = RequestMethod.GET)
+    public ModelAndView Add() {
+
+        ModelAndView mav = new ModelAndView("add");
+
+        return mav;
+    }
+
+    @RequestMapping("/emps")
+    public ModelAndView All() {
 
 
-	@RequestMapping(value = "/getemps", method = RequestMethod.GET)
-	public @ResponseBody List<Employee> getemps() {
+        ModelAndView mav = new ModelAndView("index");
 
-		List<Employee> employees = employeeService.getAllEmployees();
-		employees.stream().forEach(r->r.setName("你好"));
-		return employees;
-	}
+        List<Employee> employees = employeeService.getAllEmployees();
+
+        mav.addObject("employees", employees);
+        return mav;
+
+    }
+
+
+    @RequestMapping(value = "/getemps", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    List<Employee> getemps() {
+
+        List<Employee> employees = employeeService.getAllEmployees();
+        employees.stream().forEach(r -> r.setName("你好"));
+        return employees;
+    }
 }
